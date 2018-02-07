@@ -1,5 +1,6 @@
-package com.navigacia;
+package com.navigation;
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -20,20 +21,20 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DirectionFinder {
+class DirectionFinder {
     private static final String DIRECTION_URL_API = "https://maps.googleapis.com/maps/api/directions/json?";
     private static final String GOOGLE_API_KEY = "AIzaSyCZX6kg3ZNQe6qD9DpqwBGSZO66dqeRRKM";
     private DirectionFinderListener listener;
     private String origin;
     private String destination;
 
-    public DirectionFinder(DirectionFinderListener listener, String origin, String destination) {
+    DirectionFinder(DirectionFinderListener listener, String origin, String destination) {
         this.listener = listener;
         this.origin = origin;
         this.destination = destination;
     }
 
-    public void execute() throws UnsupportedEncodingException {
+    void execute() throws UnsupportedEncodingException {
         listener.onDirectionFinderStart();
         new DownloadRawData().execute(createUrl());
     }
@@ -41,11 +42,10 @@ public class DirectionFinder {
     private String createUrl() throws UnsupportedEncodingException {
         String urlOrigin = URLEncoder.encode(origin, "utf-8");
         String urlDestination = URLEncoder.encode(destination, "utf-8");
-
-        Log.i("sssssssssss", urlOrigin + "  " + urlDestination);
         return DIRECTION_URL_API + "origin=" + urlOrigin + "&destination=" + urlDestination + "&key=" + GOOGLE_API_KEY;
     }
 
+    @SuppressLint("StaticFieldLeak")
     private class DownloadRawData extends AsyncTask<String, Void, String> {
 
         @Override
@@ -54,12 +54,12 @@ public class DirectionFinder {
             try {
                 URL url = new URL(link);
                 InputStream is = url.openConnection().getInputStream();
-                StringBuffer buffer = new StringBuffer();
+                StringBuilder buffer = new StringBuilder();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    buffer.append(line + "\n");
+                    buffer.append(line).append("\n");
                 }
 
                 return buffer.toString();
@@ -93,7 +93,7 @@ public class DirectionFinder {
             JSONObject jsonRoute = jsonRoutes.getJSONObject(i);
             Route route = new Route();
 
-            JSONObject overview_polylineJson = jsonRoute.getJSONObject("overview_polyline");
+            JSONObject allJson = jsonRoute.getJSONObject("overview_polyline");
             JSONArray jsonLegs = jsonRoute.getJSONArray("legs");
             JSONObject jsonLeg = jsonLegs.getJSONObject(0);
             JSONObject jsonDistance = jsonLeg.getJSONObject("distance");
@@ -107,13 +107,13 @@ public class DirectionFinder {
             route.startAddress = jsonLeg.getString("start_address");
             route.startLocation = new LatLng(jsonStartLocation.getDouble("lat"), jsonStartLocation.getDouble("lng"));
             route.endLocation = new LatLng(jsonEndLocation.getDouble("lat"), jsonEndLocation.getDouble("lng"));
-            route.points = decodePolyLine(overview_polylineJson.getString("points"));
+            route.points = decodeAllJson(allJson.getString("points"));
             routes.add(route);
         }
         listener.onDirectionFinderSuccess(routes);
     }
 
-    private List<LatLng> decodePolyLine(final String poly) {
+    private List<LatLng> decodeAllJson(final String poly) {
         int len = poly.length();
         int index = 0;
         List<LatLng> decoded = new ArrayList<LatLng>();

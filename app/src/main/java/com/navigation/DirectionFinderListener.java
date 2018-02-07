@@ -1,4 +1,4 @@
-package com.navigacia;
+package com.navigation;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.navigacia;
+package com.navigation;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -61,8 +61,6 @@ public class MapsActivity extends FragmentActivity implements
 
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
-    private FusedLocationProviderClient mFusedLocationClient;
-    private Button btnFindPath;
     private EditText etOrigin;
     private EditText etDestination;
     private List<Marker> originMarkers = new ArrayList<>();
@@ -81,10 +79,14 @@ public class MapsActivity extends FragmentActivity implements
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        mFusedLocationClient = new FusedLocationProviderClient(this);
+        FusedLocationProviderClient mFusedLocationClient = new FusedLocationProviderClient(this);
         buildGoogleApiClient();
 
-        btnFindPath = findViewById(R.id.btnFindPath);
+        findViewAndClickListener();
+    }
+
+    private void findViewAndClickListener() {
+        Button btnFindPath = findViewById(R.id.btnFindPath);
         etOrigin = findViewById(R.id.etOrigin);
         etDestination = findViewById(R.id.etDestination);
 
@@ -93,7 +95,8 @@ public class MapsActivity extends FragmentActivity implements
         etDestination.setOnClickListener(this);
     }
 
-    private void autocomplit(int PLACE_AUTOCOMPLETE_REQUEST_CODE) {
+
+    private void autoComplete(int PLACE_AUTOCOMPLETE_REQUEST_CODE) {
         AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
                 .setTypeFilter(AutocompleteFilter.TYPE_FILTER_GEOCODE)
                 .build();
@@ -102,8 +105,7 @@ public class MapsActivity extends FragmentActivity implements
                     .setFilter(typeFilter)
                     .build(MapsActivity.this);
             startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
-        } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
-            // TODO: Handle the error.
+        } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException ignored) {
         }
     }
 
@@ -112,17 +114,12 @@ public class MapsActivity extends FragmentActivity implements
         if (requestCode == 0 || requestCode == 1) {
             if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(MapsActivity.this, data);
-                Log.i("ssssssssss", String.valueOf(place));
                 if (requestCode == 0) {
                     etOrigin.setText(place.getName());
                 } else etDestination.setText(place.getName());
 
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(MapsActivity.this, data);
-                // TODO: Handle the error.
-                Log.i("ssssssssss", status.getStatusMessage());
-            } else if (resultCode == RESULT_CANCELED) {
-                // The user canceled the operation.
             }
         }
     }
@@ -157,7 +154,7 @@ public class MapsActivity extends FragmentActivity implements
         }
     }
 
-    private void perm() {
+    private void showPermission() {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean bPermissionGranted = checkLocationPermission();
             if (bPermissionGranted) {
@@ -206,7 +203,7 @@ public class MapsActivity extends FragmentActivity implements
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        perm();
+        showPermission();
         createLocationRequest();
     }
 
@@ -290,11 +287,11 @@ public class MapsActivity extends FragmentActivity implements
                 break;
             }
             case R.id.etOrigin: {
-                autocomplit(0);
+                autoComplete(0);
                 break;
             }
             case R.id.etDestination: {
-                autocomplit(1);
+                autoComplete(1);
                 break;
             }
         }
