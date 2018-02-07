@@ -20,15 +20,9 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * https://maps.googleapis.com/maps/api/directions/json?origin=vanadzor&destination=erevan&key=AIzaSyCZX6kg3ZNQe6qD9DpqwBGSZO66dqeRRKM
- * Created by Mai Thanh Hiep on 4/3/2016.
- */
 public class DirectionFinder {
     private static final String DIRECTION_URL_API = "https://maps.googleapis.com/maps/api/directions/json?";
     private static final String GOOGLE_API_KEY = "AIzaSyCZX6kg3ZNQe6qD9DpqwBGSZO66dqeRRKM";
-    //    private static final String GOOGLE_API_KEY = "AIzaSyA24twt31L3Ejre2EB4DY2l6n0lMQaLO0A";
-//    private static final String GOOGLE_API_KEY = "AIzaSyCCmnswbKOYkce5C1gNq_VzFVdlCi_9nkY";
     private DirectionFinderListener listener;
     private String origin;
     private String destination;
@@ -114,10 +108,8 @@ public class DirectionFinder {
             route.startLocation = new LatLng(jsonStartLocation.getDouble("lat"), jsonStartLocation.getDouble("lng"));
             route.endLocation = new LatLng(jsonEndLocation.getDouble("lat"), jsonEndLocation.getDouble("lng"));
             route.points = decodePolyLine(overview_polylineJson.getString("points"));
-
             routes.add(route);
         }
-
         listener.onDirectionFinderSuccess(routes);
     }
 
@@ -153,39 +145,5 @@ public class DirectionFinder {
             decoded.add(new LatLng(((double) lat / 1E5), ((double) lng / 1E5)));
         }
         return decoded;
-//    private List<LatLng> decodePolyLine(String encoded) {
-//        Log.i("Location", "String received: " + encoded);
-//        ArrayList<LatLng> poly = new ArrayList<LatLng>();
-//        int index = 0, len = encoded.length();
-//        int lat = 0, lng = 0;
-//
-//        while (index < len) {
-//            int b, shift = 0, result = 0;
-//            do {
-//                b = encoded.charAt(index++) - 63;
-//                result |= (b & 0x1f) << shift;
-//                shift += 5;
-//            } while (b >= 0x20);
-//            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-//            lat += dlat;
-//
-//            shift = 0;
-//            result = 0;
-//            do {
-//                b = encoded.charAt(index++) - 63;
-//                result |= (b & 0x1f) << shift;
-//                shift += 5;
-//            } while (b >= 0x20);
-//            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-//            lng += dlng;
-//
-//            LatLng p = new LatLng((int) (((double) lat / 1E5) * 1E6), (int) (((double) lng / 1E5 * 1E6)));
-//            poly.add(p);
-//        }
-//
-//        for (int i = 0; i < poly.size(); i++) {
-//            Log.i("Location", "Point sent: Latitude: " + poly.get(i).latitude + " Longitude: " + poly.get(i).longitude);
-//        }
-//        return poly;
     }
 }

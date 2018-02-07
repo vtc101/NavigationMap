@@ -1,9 +1,6 @@
 package com.navigacia;
 
-/**
- * Created by Mai Thanh Hiep on 4/3/2016.
- */
-public class Distance {
+class Distance {
     public String text;
     public int value;
 
